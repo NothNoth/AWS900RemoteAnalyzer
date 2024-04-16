@@ -43,7 +43,6 @@ const (
 
 	CmdRequestChanNamesAndImages_FirstChannel wirego.FieldId = 80
 	CmdRequestChanNamesAndImages_LastChannel  wirego.FieldId = 81
-	CmdResponseChanNamesAndImages_ChannelName wirego.FieldId = 83
 
 	CmdResponseGetProjectNameAndTitle_ProjectName wirego.FieldId = 90
 	CmdResponseGetProjectNameAndTitle_ProjectInfo wirego.FieldId = 91
@@ -70,6 +69,7 @@ const (
 	SSLRemote_MixPassName    wirego.FieldId = 1011
 	SSLRemote_MixPassNumber  wirego.FieldId = 1012
 	SSLRemote_MixPassBasedOn wirego.FieldId = 1013
+	SSLRemote_ChannelName    wirego.FieldId = 1014
 )
 
 // Since we implement the wirego.WiregoInterface we need some structure to hold it.
@@ -148,7 +148,6 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 	//Getchan names and images
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdRequestChanNamesAndImages_FirstChannel, Name: "First", Filter: "aws900.get_chan_names_first", ValueType: wirego.ValueTypeUInt8, DisplayMode: wirego.DisplayModeDecimal})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdRequestChanNamesAndImages_LastChannel, Name: "Last", Filter: "aws900.get_chan_names_last", ValueType: wirego.ValueTypeUInt8, DisplayMode: wirego.DisplayModeDecimal})
-	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdResponseChanNamesAndImages_ChannelName, Name: "Channel name", Filter: "aws900.chan_name", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 
 	//Project name and title
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdResponseGetProjectNameAndTitle_ProjectName, Name: "Project name", Filter: "aws900.project_name", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
@@ -177,6 +176,7 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_TRInfo, Name: "TR info", Filter: "aws900.tr_info", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_TRIsSelected, Name: "TR is selected", Filter: "aws900.tr_is_selected", ValueType: wirego.ValueTypeBool, DisplayMode: wirego.DisplayModeDecimal})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_ChannelNumber, Name: "Channel number", Filter: "aws900.channel_number", ValueType: wirego.ValueTypeUInt8, DisplayMode: wirego.DisplayModeDecimal})
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_ChannelName, Name: "Channel name", Filter: "aws900.channel_name", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_DirectoryName, Name: "Directory name", Filter: "aws900.directory_name", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 
 	return fields
@@ -439,7 +439,7 @@ func parseGetChanNamesAndImagesReply(packet []byte, res *wirego.DissectResult, o
 
 		before = offs
 		chanName, _ := getString(packet, &offs)
-		commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdResponseChanNamesAndImages_ChannelName, Offset: before, Length: len(chanName) + 1})
+		commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_ChannelName, Offset: before, Length: len(chanName) + 1})
 		nameAll += chanName + "|"
 	}
 
@@ -468,7 +468,7 @@ func parseGetProjectNameAndTitleReply(packet []byte, res *wirego.DissectResult, 
 
 	res.Fields = append(res.Fields, commandFields)
 
-	return strings.TrimSuffix(projectInfo, "\n") + " / " + strings.TrimSuffix(titleInfo, "\n")
+	return strings.ReplaceAll(projectInfo, "\n", "-") + " / " + strings.ReplaceAll(titleInfo, "\n", "-")
 }
 
 func parseSendRequestFileBlock(packet []byte, res *wirego.DissectResult, offs int) string {
@@ -613,6 +613,28 @@ func parseGetTrListReply(packet []byte, res *wirego.DissectResult, offs int) str
 	return fmt.Sprintf("%s: %d TR", dirPath, count)
 }
 
+func parseSetChanNames(packet []byte, res *wirego.DissectResult, offs int) string {
+	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	allNames := ""
+
+	for {
+		before := offs
+		chanNumber, _ := getByte(packet, &offs)
+		commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_ChannelNumber, Offset: before, Length: 1})
+		if chanNumber == 0 {
+			break
+		}
+
+		before = offs
+		name, _ := getString(packet, &offs)
+		commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_ChannelName, Offset: before, Length: len(name) + 1})
+
+		allNames += fmt.Sprintf("%d:%s ", chanNumber, name)
+	}
+	res.Fields = append(res.Fields, commandFields)
+	return allNames
+}
+
 // DissectPacket provides the packet payload to be parsed.
 func (WiregoMinimalExample) DissectPacket(packetNumber int, src string, dst string, layer string, packet []byte) *wirego.DissectResult {
 	var res wirego.DissectResult
@@ -670,6 +692,10 @@ func (WiregoMinimalExample) DissectPacket(packetNumber int, src string, dst stri
 		info = parseGetMixPassesListReply(packet, &res, offs)
 	case SSLMessageGetTrListReply:
 		info = parseGetTrListReply(packet, &res, offs)
+	case SSLMessageSetChanNames:
+		info = parseSetChanNames(packet, &res, offs)
+	case SSLMessageSetChanNamesReply:
+		info = parseSetChanNames(packet, &res, offs)
 	default:
 		if offs != len(packet) {
 			commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
