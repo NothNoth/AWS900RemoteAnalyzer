@@ -8,7 +8,7 @@ import (
 )
 
 func parseSendHeartbeat(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	productName, _ := getString(packet, &offs)
@@ -20,7 +20,7 @@ func parseSendHeartbeat(packet []byte, res *wirego.DissectResult, offs int) stri
 }
 
 func parseGetIsChanStereo(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	chanNumber, _ := getByte(packet, &offs)
@@ -32,7 +32,7 @@ func parseGetIsChanStereo(packet []byte, res *wirego.DissectResult, offs int) st
 }
 
 func parseGetIsChanStereoReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	chanNumber, _ := getByte(packet, &offs)
@@ -49,7 +49,7 @@ func parseGetIsChanStereoReply(packet []byte, res *wirego.DissectResult, offs in
 }
 
 func parseGetDeskReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	productName, _ := getString(packet, &offs)
@@ -87,7 +87,7 @@ func parseGetDeskReply(packet []byte, res *wirego.DissectResult, offs int) strin
 }
 
 func parseGetDirectoryList(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	getByte(packet, &offs)
@@ -104,7 +104,7 @@ func parseGetDirectoryList(packet []byte, res *wirego.DissectResult, offs int) s
 }
 
 func parseGetDirectoryListReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	//Directory Name
 	before := offs
@@ -159,7 +159,7 @@ func parseGetDirectoryListReply(packet []byte, res *wirego.DissectResult, offs i
 }
 
 func parseSendDiskInfo(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	free, _ := getUInt32(packet, &offs)
@@ -181,7 +181,7 @@ func parseSendDiskInfo(packet []byte, res *wirego.DissectResult, offs int) strin
 }
 
 func parseGetExtNamesReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	allStr := ""
 	for {
@@ -208,7 +208,7 @@ func parseGetExtNamesReply(packet []byte, res *wirego.DissectResult, offs int) s
 }
 
 func parseGetChanNamesAndImages(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	first, _ := getByte(packet, &offs)
@@ -225,7 +225,7 @@ func parseGetChanNamesAndImages(packet []byte, res *wirego.DissectResult, offs i
 }
 
 func parseGetChanNamesAndImagesReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	nameAll := ""
 	for {
@@ -251,7 +251,7 @@ func parseGetChanNamesAndImagesReply(packet []byte, res *wirego.DissectResult, o
 }
 
 func parseGetProjectNameAndTitleReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	projectName, _ := getString(packet, &offs)
@@ -275,7 +275,7 @@ func parseGetProjectNameAndTitleReply(packet []byte, res *wirego.DissectResult, 
 }
 
 func parseSendRequestFileBlock(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	path, _ := getString(packet, &offs)
@@ -299,7 +299,7 @@ func parseSendRequestFileBlock(packet []byte, res *wirego.DissectResult, offs in
 }
 
 func parseAckRequestFileBlock(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	path, _ := getString(packet, &offs)
@@ -321,7 +321,7 @@ func parseAckRequestFileBlock(packet []byte, res *wirego.DissectResult, offs int
 }
 
 func parseGetMixPassesListReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	dirPath, _ := getString(packet, &offs)
@@ -367,7 +367,7 @@ func parseGetMixPassesListReply(packet []byte, res *wirego.DissectResult, offs i
 }
 
 func parseGetTrListReply(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 
 	before := offs
 	dirPath, _ := getString(packet, &offs)
@@ -417,7 +417,7 @@ func parseGetTrListReply(packet []byte, res *wirego.DissectResult, offs int) str
 }
 
 func parseSetChanNames(packet []byte, res *wirego.DissectResult, offs int) string {
-	commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 	allNames := ""
 
 	for {

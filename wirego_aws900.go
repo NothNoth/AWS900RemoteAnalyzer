@@ -9,64 +9,65 @@ import (
 // Define here enum identifiers, used to refer to a specific field
 const (
 	//AWS900 remote common fields
-	CmdCode      wirego.FieldId = 1
-	DestCode     wirego.FieldId = 2
-	DeskSerial   wirego.FieldId = 3
-	RemoteSerial wirego.FieldId = 4
-
-	//Common fields
-	SSLRemote_Path           wirego.FieldId = 1000
-	SSLRemote_Time           wirego.FieldId = 1001
-	SSLRemote_Date           wirego.FieldId = 1002
-	SSLRemote_Size           wirego.FieldId = 1003
-	SSLRemote_FileIndex      wirego.FieldId = 1004
-	SSLRemote_IsDir          wirego.FieldId = 1005
-	SSLRemote_ChannelNumber  wirego.FieldId = 1006
-	SSLRemote_DirectoryName  wirego.FieldId = 1007
-	SSLRemote_TRName         wirego.FieldId = 1008
-	SSLRemote_TRInfo         wirego.FieldId = 1009
-	SSLRemote_TRIsSelected   wirego.FieldId = 1010
-	SSLRemote_MixPassName    wirego.FieldId = 1011
-	SSLRemote_MixPassNumber  wirego.FieldId = 1012
-	SSLRemote_MixPassBasedOn wirego.FieldId = 1013
-	SSLRemote_ChannelName    wirego.FieldId = 1014
+	CmdCode      wirego.FieldId = iota
+	DestCode     wirego.FieldId = iota
+	DeskSerial   wirego.FieldId = iota
+	RemoteSerial wirego.FieldId = iota
 
 	//Command specific fields
-	CmdFields wirego.FieldId = 10
+	CommandDetails wirego.FieldId = iota
 
-	CmdResponseIsChanStereo_IsStereo wirego.FieldId = 22
+	//Common fields
+	SSLRemote_Path
+	SSLRemote_Time
+	SSLRemote_Date
+	SSLRemote_Size
+	SSLRemote_FileIndex      wirego.FieldId = iota
+	SSLRemote_IsDir          wirego.FieldId = iota
+	SSLRemote_ChannelNumber  wirego.FieldId = iota
+	SSLRemote_DirectoryName  wirego.FieldId = iota
+	SSLRemote_TRName         wirego.FieldId = iota
+	SSLRemote_TRInfo         wirego.FieldId = iota
+	SSLRemote_TRIsSelected   wirego.FieldId = iota
+	SSLRemote_MixPassName    wirego.FieldId = iota
+	SSLRemote_MixPassNumber  wirego.FieldId = iota
+	SSLRemote_MixPassBasedOn wirego.FieldId = iota
+	SSLRemote_ChannelName    wirego.FieldId = iota
 
-	CmdResponseGetDeskReply_ProductName  wirego.FieldId = 30
-	CmdResponseGetDeskReply_VersionMajor wirego.FieldId = 31
-	CmdResponseGetDeskReply_VersionMinor wirego.FieldId = 32
-	CmdResponseGetDeskReply_Issue        wirego.FieldId = 33
-	CmdResponseGetDeskReply_BuildVersion wirego.FieldId = 34
-	CmdResponseGetDeskReply_BuildDate    wirego.FieldId = 35
+	// Command specific fields
+	CmdResponseIsChanStereo_IsStereo wirego.FieldId = iota
 
-	CmdRequestDirectoryList_Mode wirego.FieldId = 40
+	CmdResponseGetDeskReply_ProductName  wirego.FieldId = iota
+	CmdResponseGetDeskReply_VersionMajor wirego.FieldId = iota
+	CmdResponseGetDeskReply_VersionMinor wirego.FieldId = iota
+	CmdResponseGetDeskReply_Issue        wirego.FieldId = iota
+	CmdResponseGetDeskReply_BuildVersion wirego.FieldId = iota
+	CmdResponseGetDeskReply_BuildDate    wirego.FieldId = iota
 
-	CmdResponseDirectoryList_Index wirego.FieldId = 51
-	CmdResponseDirectoryList_Name  wirego.FieldId = 52
-	CmdResponseDirectoryList_Info  wirego.FieldId = 53
+	CmdRequestDirectoryList_Mode wirego.FieldId = iota
 
-	CmdResponseSendDiskInfo_Free        wirego.FieldId = 60
-	CmdResponseSendDiskInfo_ArchiveDone wirego.FieldId = 62
+	CmdResponseDirectoryList_Index wirego.FieldId = iota
+	CmdResponseDirectoryList_Name  wirego.FieldId = iota
+	CmdResponseDirectoryList_Info  wirego.FieldId = iota
 
-	CmdResponseExtNames_Number wirego.FieldId = 70
-	CmdResponseExtNames_Name   wirego.FieldId = 71
+	CmdResponseSendDiskInfo_Free        wirego.FieldId = iota
+	CmdResponseSendDiskInfo_ArchiveDone wirego.FieldId = iota
 
-	CmdRequestChanNamesAndImages_FirstChannel wirego.FieldId = 80
-	CmdRequestChanNamesAndImages_LastChannel  wirego.FieldId = 81
+	CmdResponseExtNames_Number wirego.FieldId = iota
+	CmdResponseExtNames_Name   wirego.FieldId = iota
 
-	CmdResponseGetProjectNameAndTitle_ProjectName wirego.FieldId = 90
-	CmdResponseGetProjectNameAndTitle_ProjectInfo wirego.FieldId = 91
-	CmdResponseGetProjectNameAndTitle_TitleName   wirego.FieldId = 92
-	CmdResponseGetProjectNameAndTitle_TitleInfo   wirego.FieldId = 93
+	CmdRequestChanNamesAndImages_FirstChannel wirego.FieldId = iota
+	CmdRequestChanNamesAndImages_LastChannel  wirego.FieldId = iota
 
-	CmdRequestFileBlock_BlockPosition wirego.FieldId = 101
-	CmdRequestFileBlock_BlockLen      wirego.FieldId = 102
-	CmdRequestFileBlock_Zero          wirego.FieldId = 103
-	CmdRequestFileBlock_FileData      wirego.FieldId = 104
+	CmdResponseGetProjectNameAndTitle_ProjectName wirego.FieldId = iota
+	CmdResponseGetProjectNameAndTitle_ProjectInfo wirego.FieldId = iota
+	CmdResponseGetProjectNameAndTitle_TitleName   wirego.FieldId = iota
+	CmdResponseGetProjectNameAndTitle_TitleInfo   wirego.FieldId = iota
+
+	CmdRequestFileBlock_BlockPosition wirego.FieldId = iota
+	CmdRequestFileBlock_BlockLen      wirego.FieldId = iota
+	CmdRequestFileBlock_Zero          wirego.FieldId = iota
+	CmdRequestFileBlock_FileData      wirego.FieldId = iota
 )
 
 // Since we implement the wirego.WiregoInterface we need some structure to hold it.
@@ -113,7 +114,7 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: RemoteSerial, Name: "Remote Serial", Filter: "aws900.remote_serial", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
 
 	//Specific command fields
-	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdFields, Name: "Command arguments", Filter: "aws900.command_args", ValueType: wirego.ValueTypeNone, DisplayMode: wirego.DisplayModeNone})
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CommandDetails, Name: "Command arguments", Filter: "aws900.command_args", ValueType: wirego.ValueTypeNone, DisplayMode: wirego.DisplayModeNone})
 
 	//Stereo
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdResponseIsChanStereo_IsStereo, Name: "Is stereo", Filter: "aws900.is_stereo", ValueType: wirego.ValueTypeBool, DisplayMode: wirego.DisplayModeDecimal})
@@ -264,7 +265,7 @@ func (WiregoMinimalExample) DissectPacket(packetNumber int, src string, dst stri
 		info = parseSetChanNames(packet, &res, offs)
 	default:
 		if offs != len(packet) {
-			commandFields := wirego.DissectField{WiregoFieldId: CmdFields, Offset: offs, Length: len(packet) - offs}
+			commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
 			res.Fields = append(res.Fields, commandFields)
 			info = fmt.Sprintf("TODO (%d/%d parsed)", offs, len(packet))
 		}
