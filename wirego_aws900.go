@@ -18,10 +18,11 @@ const (
 	CommandDetails wirego.FieldId = iota
 
 	//Common fields
-	SSLRemote_Path
-	SSLRemote_Time
-	SSLRemote_Date
-	SSLRemote_Size
+	SSLRemote_Path           wirego.FieldId = iota
+	SSLRemote_Time           wirego.FieldId = iota
+	SSLRemote_Date           wirego.FieldId = iota
+	SSLRemote_Size           wirego.FieldId = iota
+	SSLRemote_FileInfo       wirego.FieldId = iota
 	SSLRemote_FileIndex      wirego.FieldId = iota
 	SSLRemote_IsDir          wirego.FieldId = iota
 	SSLRemote_ChannelNumber  wirego.FieldId = iota
@@ -33,6 +34,7 @@ const (
 	SSLRemote_MixPassNumber  wirego.FieldId = iota
 	SSLRemote_MixPassBasedOn wirego.FieldId = iota
 	SSLRemote_ChannelName    wirego.FieldId = iota
+	SSLRemote_Zero           wirego.FieldId = iota
 
 	// Command specific fields
 	CmdResponseIsChanStereo_IsStereo wirego.FieldId = iota
@@ -66,8 +68,11 @@ const (
 
 	CmdRequestFileBlock_BlockPosition wirego.FieldId = iota
 	CmdRequestFileBlock_BlockLen      wirego.FieldId = iota
-	CmdRequestFileBlock_Zero          wirego.FieldId = iota
 	CmdRequestFileBlock_FileData      wirego.FieldId = iota
+
+	CmdAckWriteFileBlock_Position wirego.FieldId = iota
+	CmdAckWriteFileBlock_Length   wirego.FieldId = iota
+	SSLRemote_TODO                wirego.FieldId = iota
 )
 
 // Since we implement the wirego.WiregoInterface we need some structure to hold it.
@@ -115,6 +120,7 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 
 	//Specific command fields
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CommandDetails, Name: "Command arguments", Filter: "aws900.command_args", ValueType: wirego.ValueTypeNone, DisplayMode: wirego.DisplayModeNone})
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_TODO, Name: "UNSUPPORTED PACKET", Filter: "aws900.todo", ValueType: wirego.ValueTypeNone, DisplayMode: wirego.DisplayModeNone})
 
 	//Stereo
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdResponseIsChanStereo_IsStereo, Name: "Is stereo", Filter: "aws900.is_stereo", ValueType: wirego.ValueTypeBool, DisplayMode: wirego.DisplayModeDecimal})
@@ -156,7 +162,6 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 	//Requets file block
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdRequestFileBlock_BlockPosition, Name: "Block position", Filter: "aws900.block_position", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdRequestFileBlock_BlockLen, Name: "Block length", Filter: "aws900.block_len", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
-	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdRequestFileBlock_Zero, Name: "Zero", Filter: "aws900.zero", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdRequestFileBlock_FileData, Name: "File contents", Filter: "aws900.file", ValueType: wirego.ValueTypeNone, DisplayMode: wirego.DisplayModeNone})
 
 	//Common fields
@@ -164,6 +169,7 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_Time, Name: "Time", Filter: "aws900.time", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_Date, Name: "Date", Filter: "aws900.date", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_Size, Name: "Size", Filter: "aws900.size", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_FileInfo, Name: "File info", Filter: "aws900.file_info", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_FileIndex, Name: "File index", Filter: "aws900.file_index", ValueType: wirego.ValueTypeUInt16, DisplayMode: wirego.DisplayModeDecimal})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_IsDir, Name: "IsDir", Filter: "aws900.is_dir", ValueType: wirego.ValueTypeBool, DisplayMode: wirego.DisplayModeDecimal})
 
@@ -176,6 +182,10 @@ func (WiregoMinimalExample) GetFields() []wirego.WiresharkField {
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_ChannelNumber, Name: "Channel number", Filter: "aws900.channel_number", ValueType: wirego.ValueTypeUInt8, DisplayMode: wirego.DisplayModeDecimal})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_ChannelName, Name: "Channel name", Filter: "aws900.channel_name", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
 	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_DirectoryName, Name: "Directory name", Filter: "aws900.directory_name", ValueType: wirego.ValueTypeCString, DisplayMode: wirego.DisplayModeNone})
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: SSLRemote_Zero, Name: "Zero", Filter: "aws900.zero", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
+
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdAckWriteFileBlock_Position, Name: "File block position", Filter: "aws900.file_block_position", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
+	fields = append(fields, wirego.WiresharkField{WiregoFieldId: CmdAckWriteFileBlock_Length, Name: "File block length", Filter: "aws900.file_block_length", ValueType: wirego.ValueTypeUInt32, DisplayMode: wirego.DisplayModeDecimal})
 
 	return fields
 }
@@ -263,10 +273,22 @@ func (WiregoMinimalExample) DissectPacket(packetNumber int, src string, dst stri
 		info = parseSetChanNames(packet, &res, offs)
 	case SSLMessageSetChanNamesReply:
 		info = parseSetChanNames(packet, &res, offs)
+	case SSLMessageSetFileInfo:
+		info = parseSetFileInfo(packet, &res, offs)
+	case SSLMessageAckWriteFileBlock:
+		info = parseAckWriteFileBlock(packet, &res, offs)
+	case SSLMessageSendWriteFileBlock:
+		info = parseSendWriteFileBlock(packet, &res, offs)
+	case SSLMessageSendDeleteFile:
+		info = parseSendDeleteFile(packet, &res, offs)
+	case SSLMessageSendTitleDetailsChanged:
+		info = parseSendTitleDetailsChanged(packet, &res, offs)
 	default:
 		if offs != len(packet) {
 			commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
+			todo := wirego.DissectField{WiregoFieldId: SSLRemote_TODO, Offset: offs, Length: len(packet) - offs}
 			res.Fields = append(res.Fields, commandFields)
+			res.Fields = append(res.Fields, todo)
 			info = fmt.Sprintf("TODO (%d/%d parsed)", offs, len(packet))
 		}
 

@@ -291,11 +291,11 @@ func parseSendRequestFileBlock(packet []byte, res *wirego.DissectResult, offs in
 
 	before = offs
 	getUInt32(packet, &offs)
-	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdRequestFileBlock_Zero, Offset: before, Length: 4})
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Zero, Offset: before, Length: 4})
 
 	res.Fields = append(res.Fields, commandFields)
 
-	return fmt.Sprintf("read %s: %d bytes at %d", path, blockLen, blockPos)
+	return fmt.Sprintf("Read %d bytes at %d in %s", blockLen, blockPos, path)
 }
 
 func parseAckRequestFileBlock(packet []byte, res *wirego.DissectResult, offs int) string {
@@ -436,4 +436,88 @@ func parseSetChanNames(packet []byte, res *wirego.DissectResult, offs int) strin
 	}
 	res.Fields = append(res.Fields, commandFields)
 	return allNames
+}
+
+func parseSetFileInfo(packet []byte, res *wirego.DissectResult, offs int) string {
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
+
+	before := offs
+	path, _ := getString(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Path, Offset: before, Length: len(path) + 1})
+
+	before = offs
+	info, _ := getString(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_FileInfo, Offset: before, Length: len(info) + 1})
+
+	res.Fields = append(res.Fields, commandFields)
+	return path
+}
+
+func parseAckWriteFileBlock(packet []byte, res *wirego.DissectResult, offs int) string {
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
+
+	before := offs
+	path, _ := getString(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Path, Offset: before, Length: len(path) + 1})
+
+	before = offs
+	writeBlockPos, _ := getUInt32(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdAckWriteFileBlock_Position, Offset: before, Length: 4})
+
+	before = offs
+	writeBlockLen, _ := getUInt32(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdAckWriteFileBlock_Length, Offset: before, Length: 4})
+
+	res.Fields = append(res.Fields, commandFields)
+	return fmt.Sprintf("Write ack %d bytes at %d in %s", writeBlockLen, writeBlockPos, path)
+}
+
+func parseSendWriteFileBlock(packet []byte, res *wirego.DissectResult, offs int) string {
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
+
+	before := offs
+	path, _ := getString(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Path, Offset: before, Length: len(path) + 1})
+
+	before = offs
+	writeBlockPos, _ := getUInt32(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdAckWriteFileBlock_Position, Offset: before, Length: 4})
+
+	before = offs
+	writeBlockLen, _ := getUInt32(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdAckWriteFileBlock_Length, Offset: before, Length: 4})
+
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: CmdRequestFileBlock_FileData, Offset: offs, Length: int(writeBlockLen)})
+	offs += int(writeBlockLen)
+
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Zero, Offset: offs, Length: 4})
+
+	res.Fields = append(res.Fields, commandFields)
+	return fmt.Sprintf("Write %d bytes at %d in %s", writeBlockLen, writeBlockPos, path)
+}
+
+func parseSendDeleteFile(packet []byte, res *wirego.DissectResult, offs int) string {
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
+
+	before := offs
+	path, _ := getString(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Path, Offset: before, Length: len(path) + 1})
+
+	before = offs
+	getUInt32(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Zero, Offset: before, Length: 4})
+
+	res.Fields = append(res.Fields, commandFields)
+	return "Delete " + path
+}
+
+func parseSendTitleDetailsChanged(packet []byte, res *wirego.DissectResult, offs int) string {
+	commandFields := wirego.DissectField{WiregoFieldId: CommandDetails, Offset: offs, Length: len(packet) - offs}
+
+	before := offs
+	getUInt32(packet, &offs)
+	commandFields.SubFields = append(commandFields.SubFields, wirego.DissectField{WiregoFieldId: SSLRemote_Zero, Offset: before, Length: 4})
+
+	res.Fields = append(res.Fields, commandFields)
+	return ""
 }
