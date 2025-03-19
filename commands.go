@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/quarkslab/wirego/wirego/wirego"
+	"github.com/quarkslab/wirego/wirego_remote/go/wirego"
 )
 
 func parseSendHeartbeat(packet []byte, res *wirego.DissectResult, offs int) string {

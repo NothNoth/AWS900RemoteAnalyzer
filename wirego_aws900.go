@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/quarkslab/wirego/wirego/wirego"
+	"github.com/quarkslab/wirego/wirego_remote/go/wirego"
 )
 
 // Define here enum identifiers, used to refer to a specific field
@@ -80,15 +80,17 @@ type WiregoMinimalExample struct {
 }
 
 // Unused (but mandatory)
-func main() {}
-
-// Called at golang environment initialization (you should probably not touch this)
-func init() {
+func main() {
 	var wge WiregoMinimalExample
 
-	//Register to the wirego package
-	wirego.Register(wge)
-	wirego.ResultsCacheEnable(false)
+	wg, err := wirego.New("ipc:///tmp/wirego0", false, wge)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	wg.ResultsCacheEnable(false)
+
+	wg.Listen()
 }
 
 // This function is called when the plugin is loaded.
