@@ -17,8 +17,9 @@ Building:
 
 Running:
 
+  - run "./aws900"
   - run Wireshark
-  - On the Wirego's preferences, point to **wirego_aws900.so**
+  - On the Wirego's preferences, make sur the endpoint **ipc:///tmp/wirego0** is set
   - restart Wireshark and open your pcap file
 
 ## State of work
